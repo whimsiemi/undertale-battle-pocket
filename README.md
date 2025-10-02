@@ -1,2 +1,2 @@
-# undertale-battle-pocket
-a gameboy styled demake of the undertale battle system in raylib
+# UNDERTALE Pocket Battle
+A Game Boy styled demake of UNDERTALE's battle system in RayLib!
