@@ -19,7 +19,7 @@ int main()
     
     Color gbDark = GetColor(0x0F380FFF);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth * windowScale, screenHeight * windowScale, "UNDERTALE Battle System - Game Boy'd!");
+    InitWindow(screenWidth * windowScale, screenHeight * windowScale, "UNDERTALE Pocket Battle");
     SetTargetFPS(30);
 
     RenderTexture2D target = LoadRenderTexture(screenWidth, screenHeight);
