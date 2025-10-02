@@ -11,6 +11,7 @@ namespace atlas {
         int spriteCount;
     } TextureAtlas;
 
+    // Function for loading texture atlases by parsing the parameters of the defined rtpa file
     TextureAtlas LoadAtlas(const char *rtpaPath) {
         // Initalize atlas
         TextureAtlas atlas = {0};
@@ -21,7 +22,7 @@ namespace atlas {
         char line[256];
         char imagePath[128] = {0};
 
-        // Gets the path of the image and the index of its sprites by reading the lines with "a" and "s" prefixes
+        // This while loops gets the path of the image and the index of its sprites by reading the lines with "a" and "s" prefixes
         while (fgets(line, sizeof(line), file)) {
             if (line[0] == '#') continue;
 
@@ -51,6 +52,7 @@ namespace atlas {
         return atlas;
     }
 
+    // Function for drawing sprites defined within an atlas
     void DrawAtlasSprite(TextureAtlas atlas, const char *spriteName, Vector2 position) {
         // Find the sprite within the atlas's sprite array and draw it if found
         for (int i = 0; i < atlas.spriteCount; i++) {
