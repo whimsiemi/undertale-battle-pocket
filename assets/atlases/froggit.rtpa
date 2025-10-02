@@ -1,0 +1,26 @@
+#
+# rTexPacker atlas descriptor file (v5.0)
+#
+# Number of packed sprites:     17
+#
+# Atlas info:    a <imagePath> <width> <height> <spriteCount> <isFont> <fontSize>
+# Sprite info:   s <nameId> <tag> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight> <colliderType> <colliderX> <colliderY> <colliderSizeX> <colliderSizeY>
+#
+a assets/imgs/froggit_atlas.png 512 112 17 0 32
+s froggit1 "" 0 0 0 0 56 56 0 0 8 11 46 45 0 0 0 0 0
+s froggit2 "" 0 0 56 0 56 56 0 0 8 12 47 44 0 0 0 0 0
+s froggit3 "" 0 0 112 0 56 56 0 0 8 13 48 43 0 0 0 0 0
+s froggit4 "" 0 0 168 0 56 56 0 0 8 12 48 44 0 0 0 0 0
+s froggit5 "" 0 0 224 0 56 56 0 0 8 11 47 45 0 0 0 0 0
+s froggit6 "" 0 0 280 0 56 56 0 0 8 11 46 45 0 0 0 0 0
+s froggit7 "" 0 0 336 0 56 56 0 0 8 10 45 46 0 0 0 0 0
+s froggit8 "" 0 0 392 0 56 56 0 0 8 10 44 46 0 0 0 0 0
+s froggit9 "" 0 0 448 0 56 56 0 0 7 10 44 46 0 0 0 0 0
+s froggit10 "" 0 0 0 56 56 56 0 0 6 11 44 45 0 0 0 0 0
+s froggit11 "" 0 0 56 56 56 56 0 0 5 12 44 44 0 0 0 0 0
+s froggit12 "" 0 0 112 56 56 56 0 0 4 12 44 44 0 0 0 0 0
+s froggit13 "" 0 0 168 56 56 56 0 0 5 13 44 43 0 0 0 0 0
+s froggit14 "" 0 0 224 56 56 56 0 0 6 12 44 44 0 0 0 0 0
+s froggit15 "" 0 0 280 56 56 56 0 0 7 12 44 44 0 0 0 0 0
+s froggit16 "" 0 0 336 56 56 56 0 0 8 11 44 45 0 0 0 0 0
+s froggit17 "" 0 0 392 56 56 56 0 0 8 11 45 45 0 0 0 0 0

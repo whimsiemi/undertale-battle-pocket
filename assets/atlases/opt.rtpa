@@ -1,0 +1,13 @@
+#
+# rTexPacker atlas descriptor file (v5.0)
+#
+# Number of packed sprites:     4
+#
+# Atlas info:    a <imagePath> <width> <height> <spriteCount> <isFont> <fontSize>
+# Sprite info:   s <nameId> <tag> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight> <colliderType> <colliderX> <colliderY> <colliderSizeX> <colliderSizeY>
+#
+a assets/imgs/opt_atlas.png 112 11 4 0 32
+s fight "" 0 0 0 0 28 11 0 0 0 0 28 11 0 0 0 0 0
+s act "" 0 0 28 0 28 11 0 0 0 0 28 11 0 0 0 0 0
+s item "" 0 0 56 0 28 11 0 0 0 0 28 11 0 0 0 0 0
+s mercy "" 0 0 84 0 28 11 0 0 0 0 28 11 0 0 0 0 0
