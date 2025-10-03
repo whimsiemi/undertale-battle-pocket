@@ -11,6 +11,14 @@ namespace atlas {
         int spriteCount;
     } TextureAtlas;
 
+    class AnimAtlas {
+        public:
+            TextureAtlas atlas;
+            int curFrame;
+            int stepsToAnim;
+            int curStep;
+    };
+
     // Function for loading texture atlases by parsing the parameters of the defined rtpa file
     TextureAtlas LoadAtlas(const char *rtpaPath) {
         // Initalize atlas
@@ -61,5 +69,16 @@ namespace atlas {
                 break;
             }
         }
+    }
+
+    void AnimateAtlasSprite(AnimAtlas& anim, Vector2 position) {
+        if (anim.curStep == anim.stepsToAnim) {
+            if (anim.curFrame != anim.atlas.spriteCount - 1) {anim.curFrame++;}
+            else {anim.curFrame = 0;}
+            anim.curStep = 0;
+        }
+        else {anim.curStep++;}
+        
+        DrawTextureRec(anim.atlas.texture, anim.atlas.sprites[anim.curFrame].sourceRec, position, WHITE);
     }
 }
