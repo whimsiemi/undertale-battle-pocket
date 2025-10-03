@@ -49,6 +49,9 @@ int main()
     bool leftPressed = false;
     bool rightPressed = false;
 
+    const int maxHp = 20;
+    int curHp = maxHp;
+
     // Main game loop
     while (!WindowShouldClose()) {
 
@@ -75,16 +78,21 @@ int main()
         // Draws all visuals
         DrawTexture(bg, 0, 0, WHITE);
         DrawTexture(textBox, 7, 78, WHITE);
-        DrawAtlasSprite(optAtlas, (menuSelect == 0 ? "fight_selected" : "fight"), (Vector2){7, 124});
-        DrawAtlasSprite(optAtlas, (menuSelect == 1 ? "act_selected" : "act"), (Vector2){46, 124});
-        DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 124});
-        DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 124});
+        DrawAtlasSprite(optAtlas, (menuSelect == 0 ? "fight_selected" : "fight"), (Vector2){7, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 1 ? "act_selected" : "act"), (Vector2){46, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
 
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
         AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22});
 
         // Draws text within the text box
         DrawTextEx(font, "* Froggit hopped close!", (Vector2){11, 82}, (float)font.baseSize, 2, gb);
+
+        std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
+        infoStr += TextFormat("/%d", maxHp);
+
+        DrawTextEx(font, infoStr.c_str(), (Vector2){7, 116}, (float)font.baseSize, 2, gb);
 
         // Draws render texture to the screen at a scale relative to the window size
         EndTextureMode();
