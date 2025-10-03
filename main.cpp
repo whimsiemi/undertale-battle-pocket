@@ -57,7 +57,7 @@ int main()
         DrawAtlasSprite(optAtlas, "mercy", (Vector2){125, 124});
 
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
-        AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22});
+        AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22});
 
         // Draws render texture to the screen at a scale relative to the window size
         EndTextureMode();

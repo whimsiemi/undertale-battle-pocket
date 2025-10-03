@@ -1,3 +1,5 @@
+#include <iostream>
+#include <string>
 // Thank you to the internet for making this so much easier <3
 namespace atlas {
     typedef struct {
@@ -71,9 +73,15 @@ namespace atlas {
         }
     }
 
-    void AnimateAtlasSprite(AnimAtlas& anim, Vector2 position) {
+    // Function for handling atlases that contain animated sprites
+    void AnimateAtlasSprite(AnimAtlas& anim, const char *animName, Vector2 position) {
+        std::string nextAnimName = anim.atlas.sprites[anim.curFrame + 1].name;
+        while (nextAnimName != "") {
+            if (std::isdigit(nextAnimName.back())) {nextAnimName.pop_back();}
+            else {break;}
+        }
         if (anim.curStep == anim.stepsToAnim) {
-            if (anim.curFrame != anim.atlas.spriteCount - 1) {anim.curFrame++;}
+            if (anim.curFrame != anim.atlas.spriteCount - 1 && strcmp(nextAnimName.c_str(), animName) == 0) {anim.curFrame++;}
             else {anim.curFrame = 0;}
             anim.curStep = 0;
         }
