@@ -21,7 +21,7 @@ int main()
     PlayMusicStream(music);
     
     // Defining a color for the background (note: kind of redundant, oops)
-    Color gbDark = GetColor(0x0F380FFF);
+    Color gb = GetColor(0x9BBC0FFF);
     
     // When we initialize the window, we want the player to be able to resize it to be as big as they want
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -39,25 +39,52 @@ int main()
     TextureAtlas optAtlas = LoadAtlas("assets/atlases/opt.rtpa");
     AnimAtlas froggitAtlas = {LoadAtlas("assets/atlases/froggit.rtpa"), 0, 3, 0};
 
+    // Font asset
+    Font font = LoadFontEx("assets/fonts/detectives_n_dames_by_2bitcrook.ttf", 8, 0, 95);
+
+    // Used for determining which option to highlight (and select if the select key is pressed once that's implemented)
+    int menuSelect = 0;
+
+    // Bools for keyboard/controller input polling
+    bool leftPressed = false;
+    bool rightPressed = false;
+
     // Main game loop
     while (!WindowShouldClose()) {
 
         // Initialization for drawing and music
         BeginTextureMode(target);
         UpdateMusicStream(music);
-        ClearBackground(gbDark);
+        ClearBackground(gb);
         BeginDrawing();
+
+        // Polls left/right inputs on keyboard/controller
+        leftPressed = IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
+        rightPressed = IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+
+        // Navigate menu using polled inputs if either are true
+        if (rightPressed) {
+            if (menuSelect < 3) {menuSelect++;}
+            else {menuSelect = 0;}
+        }
+        else if (leftPressed) {
+            if (menuSelect > 0) {menuSelect--;}
+            else {menuSelect = 3;}
+        }
 
         // Draws all visuals
         DrawTexture(bg, 0, 0, WHITE);
         DrawTexture(textBox, 7, 78, WHITE);
-        DrawAtlasSprite(optAtlas, "fight", (Vector2){7, 124});
-        DrawAtlasSprite(optAtlas, "act", (Vector2){46, 124});
-        DrawAtlasSprite(optAtlas, "item", (Vector2){86, 124});
-        DrawAtlasSprite(optAtlas, "mercy", (Vector2){125, 124});
+        DrawAtlasSprite(optAtlas, (menuSelect == 0 ? "fight_selected" : "fight"), (Vector2){7, 124});
+        DrawAtlasSprite(optAtlas, (menuSelect == 1 ? "act_selected" : "act"), (Vector2){46, 124});
+        DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 124});
+        DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 124});
 
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
         AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22});
+
+        // Draws text within the text box
+        DrawTextEx(font, "* Froggit hopped close!", (Vector2){11, 82}, (float)font.baseSize, 2, gb);
 
         // Draws render texture to the screen at a scale relative to the window size
         EndTextureMode();
