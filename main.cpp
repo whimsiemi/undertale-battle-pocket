@@ -17,8 +17,18 @@ int main()
     InitAudioDevice();
 
     // My tracker music! Hooray!
-    Music music = LoadMusicStream("assets/music/enemy_approaching.wav");
-    PlayMusicStream(music);
+    Music musCh1 = LoadMusicStream("assets/music/mus.ch1.wav");
+    Music musCh2 = LoadMusicStream("assets/music/mus.ch2.wav");
+    SetMusicVolume(musCh2, 0.6f);
+    Music musCh3 = LoadMusicStream("assets/music/mus.ch3.wav");
+    Music musCh4 = LoadMusicStream("assets/music/mus.ch4.wav");
+    SetMusicVolume(musCh4, 0.6f);
+    Music sfxCh2 = LoadMusicStream("assets/music/sfx.ch2.wav");
+    Music sfxCh4 = LoadMusicStream("assets/music/sfx.ch4.wav");
+    PlayMusicStream(musCh1);
+    PlayMusicStream(musCh2);
+    PlayMusicStream(musCh3);
+    PlayMusicStream(musCh4);
     
     // Defining a color for the background (note: kind of redundant, oops)
     Color gb = GetColor(0x9BBC0FFF);
@@ -55,24 +65,51 @@ int main()
     // Main game loop
     while (!WindowShouldClose()) {
 
-        // Initialization for drawing and music
+        // Initialization for drawing and music (music is separated into channels, sound effects replacing the output of music in certain channels while they are playing)
         BeginTextureMode(target);
-        UpdateMusicStream(music);
+        UpdateMusicStream(musCh1);
+        UpdateMusicStream(musCh2);
+        UpdateMusicStream(musCh3);
+        UpdateMusicStream(musCh4);
+        UpdateMusicStream(sfxCh2);
+        UpdateMusicStream(sfxCh4);
         ClearBackground(gb);
         BeginDrawing();
 
         // Polls left/right inputs on keyboard/controller
-        leftPressed = IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
-        rightPressed = IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+        leftPressed = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) <= -0.5f;
+        rightPressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) >= 0.5f;
 
-        // Navigate menu using polled inputs if either are true
-        if (rightPressed) {
+        // Navigate menu using polled inputs (also handles sound effects overwriting music in their respective channels)
+        if (rightPressed && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect < 3) {menuSelect++;}
             else {menuSelect = 0;}
+            PauseMusicStream(musCh4);
+            PlayMusicStream(sfxCh4);
         }
-        else if (leftPressed) {
+        else if (leftPressed && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect > 0) {menuSelect--;}
             else {menuSelect = 3;}
+            PauseMusicStream(musCh4);
+            PlayMusicStream(sfxCh4);
+        }
+        if ((IsKeyDown(KEY_Z) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && !IsMusicStreamPlaying(sfxCh2))
+        {
+            PauseMusicStream(musCh2);
+            PlayMusicStream(sfxCh2); 
+        }
+        
+        // Resyncs music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
+        if (IsMusicStreamPlaying(sfxCh4) && (GetMusicTimePlayed(sfxCh4) / GetMusicTimeLength(sfxCh4)) >= 0.5f) {
+            StopMusicStream(sfxCh4);
+            ResumeMusicStream(musCh4);
+            SeekMusicStream(musCh4, GetMusicTimePlayed(musCh1) + GetFrameTime());
+        }
+
+        if (IsMusicStreamPlaying(sfxCh2) && (GetMusicTimePlayed(sfxCh2) / GetMusicTimeLength(sfxCh2)) >= 0.5f) {
+            StopMusicStream(sfxCh2);
+            ResumeMusicStream(musCh2);
+            SeekMusicStream(musCh2, GetMusicTimePlayed(musCh1) + GetFrameTime());
         }
 
         // Draws all visuals
@@ -102,7 +139,12 @@ int main()
     }
 
     // Clearing stuff from RAM and closing the game when game loop ends
-    UnloadMusicStream(music);
+    UnloadMusicStream(musCh1);
+    UnloadMusicStream(musCh2);
+    UnloadMusicStream(musCh3);
+    UnloadMusicStream(musCh4);
+    UnloadMusicStream(sfxCh2);
+    UnloadMusicStream(sfxCh4);
     UnloadRenderTexture(target);
     CloseAudioDevice();
     CloseWindow();
