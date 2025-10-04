@@ -102,14 +102,14 @@ int main()
         // Resyncs music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
         if (IsMusicStreamPlaying(sfxCh4) && (GetMusicTimePlayed(sfxCh4) / GetMusicTimeLength(sfxCh4)) >= 0.5f) {
             StopMusicStream(sfxCh4);
+            SeekMusicStream(musCh4, GetMusicTimePlayed(musCh3) + GetFrameTime());
             ResumeMusicStream(musCh4);
-            SeekMusicStream(musCh4, GetMusicTimePlayed(musCh1) + GetFrameTime());
         }
 
         if (IsMusicStreamPlaying(sfxCh2) && (GetMusicTimePlayed(sfxCh2) / GetMusicTimeLength(sfxCh2)) >= 0.5f) {
             StopMusicStream(sfxCh2);
+            SeekMusicStream(musCh2, GetMusicTimePlayed(musCh3) + GetFrameTime());
             ResumeMusicStream(musCh2);
-            SeekMusicStream(musCh2, GetMusicTimePlayed(musCh1) + GetFrameTime());
         }
 
         // Draws all visuals
