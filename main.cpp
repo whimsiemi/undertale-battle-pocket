@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "headers/atlas.h"
+#include "headers/input.h"
 using namespace std;
 using namespace atlas;
-
+using namespace input;
 int main()
 {
     // Window parameters go here
@@ -53,10 +54,6 @@ int main()
     // Used for determining which option to highlight (and select if the select key is pressed once that's implemented)
     int menuSelect = 0;
 
-    // Bools for keyboard/controller input polling
-    bool leftPressed = false;
-    bool rightPressed = false;
-
     const int maxHp = 20;
     int curHp = maxHp;
 
@@ -74,24 +71,20 @@ int main()
         ClearBackground(gb);
         BeginDrawing();
 
-        // Polls left/right inputs on keyboard/controller
-        leftPressed = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) <= -0.5f;
-        rightPressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) >= 0.5f;
-
-        // Navigate menu using polled inputs (also handles sound effects overwriting music in their respective channels)
-        if (rightPressed && !IsMusicStreamPlaying(sfxCh4)) {
+        // Navigate menu using polled inputs checked within the input header's "getInput" function (also handles sound effects overwriting music in their respective channels)
+        if (getInput("right") && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect < 3) {menuSelect++;}
             else {menuSelect = 0;}
             SetMusicVolume(musCh4, 0);
             PlayMusicStream(sfxCh4);
         }
-        else if (leftPressed && !IsMusicStreamPlaying(sfxCh4)) {
+        else if (getInput("left") && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect > 0) {menuSelect--;}
             else {menuSelect = 3;}
             SetMusicVolume(musCh4, 0);
             PlayMusicStream(sfxCh4);
         }
-        if ((IsKeyDown(KEY_Z) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && !IsMusicStreamPlaying(sfxCh2))
+        if (getInput("select") && !IsMusicStreamPlaying(sfxCh2))
         {
             SetMusicVolume(musCh2, 0);
             PlayMusicStream(sfxCh2); 
