@@ -19,10 +19,8 @@ int main()
     // My tracker music! Hooray!
     Music musCh1 = LoadMusicStream("assets/music/mus.ch1.wav");
     Music musCh2 = LoadMusicStream("assets/music/mus.ch2.wav");
-    SetMusicVolume(musCh2, 0.6f);
     Music musCh3 = LoadMusicStream("assets/music/mus.ch3.wav");
     Music musCh4 = LoadMusicStream("assets/music/mus.ch4.wav");
-    SetMusicVolume(musCh4, 0.6f);
     Music sfxCh2 = LoadMusicStream("assets/music/sfx.ch2.wav");
     Music sfxCh4 = LoadMusicStream("assets/music/sfx.ch4.wav");
     PlayMusicStream(musCh1);
@@ -84,32 +82,30 @@ int main()
         if (rightPressed && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect < 3) {menuSelect++;}
             else {menuSelect = 0;}
-            PauseMusicStream(musCh4);
+            SetMusicVolume(musCh4, 0);
             PlayMusicStream(sfxCh4);
         }
         else if (leftPressed && !IsMusicStreamPlaying(sfxCh4)) {
             if (menuSelect > 0) {menuSelect--;}
             else {menuSelect = 3;}
-            PauseMusicStream(musCh4);
+            SetMusicVolume(musCh4, 0);
             PlayMusicStream(sfxCh4);
         }
         if ((IsKeyDown(KEY_Z) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && !IsMusicStreamPlaying(sfxCh2))
         {
-            PauseMusicStream(musCh2);
+            SetMusicVolume(musCh2, 0);
             PlayMusicStream(sfxCh2); 
         }
         
-        // Resyncs music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
+        // Unmutes music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
         if (IsMusicStreamPlaying(sfxCh4) && (GetMusicTimePlayed(sfxCh4) / GetMusicTimeLength(sfxCh4)) >= 0.5f) {
             StopMusicStream(sfxCh4);
-            SeekMusicStream(musCh4, GetMusicTimePlayed(musCh3) + GetFrameTime());
-            ResumeMusicStream(musCh4);
+            SetMusicVolume(musCh4, 1);
         }
 
         if (IsMusicStreamPlaying(sfxCh2) && (GetMusicTimePlayed(sfxCh2) / GetMusicTimeLength(sfxCh2)) >= 0.5f) {
             StopMusicStream(sfxCh2);
-            SeekMusicStream(musCh2, GetMusicTimePlayed(musCh3) + GetFrameTime());
-            ResumeMusicStream(musCh2);
+            SetMusicVolume(musCh2, 1);
         }
 
         // Draws all visuals
