@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+
 // Thank you to the internet for making this so much easier <3
 namespace atlas {
     typedef struct {
@@ -84,8 +85,7 @@ namespace atlas {
             if (anim.curFrame != anim.atlas.spriteCount - 1 && strcmp(nextAnimName.c_str(), animName) == 0) {anim.curFrame++;}
             else {anim.curFrame = 0;}
             anim.curStep = 0;
-        }
-        else {anim.curStep++;}
+        } else {anim.curStep++;}
         
         DrawTextureRec(anim.atlas.texture, anim.atlas.sprites[anim.curFrame].sourceRec, position, WHITE);
     }

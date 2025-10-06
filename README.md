@@ -1,5 +1,6 @@
 # UNDERTALE Pocket Battle
 A Game Boy styled demake of UNDERTALE's battle system in raylib!
+![Footage of an early build](resources/FroggitBattle.gif)
 
 ## SOFTWARE USED:
 - Code: [Visual Studio Code](https://github.com/microsoft/vscode) by [Microsoft](https://github.com/microsoft) (build tasks taken from [raylib-VSCode-Template](https://github.com/AndrewHamel111/raylib-VSCode-Template))
