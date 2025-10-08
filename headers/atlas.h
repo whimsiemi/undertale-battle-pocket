@@ -75,17 +75,13 @@ namespace atlas {
     }
 
     // Function for handling atlases that contain animated sprites
-    void AnimateAtlasSprite(AnimAtlas& anim, const char *animName, Vector2 position) {
-        std::string nextAnimName = anim.atlas.sprites[anim.curFrame + 1].name;
-        while (nextAnimName != "") {
-            if (std::isdigit(nextAnimName.back())) {nextAnimName.pop_back();}
-            else {break;}
-        }
+    void AnimateAtlasSprite(AnimAtlas& anim, Vector2 position) {
         if (anim.curStep == anim.stepsToAnim) {
-            if (anim.curFrame != anim.atlas.spriteCount - 1 && strcmp(nextAnimName.c_str(), animName) == 0) {anim.curFrame++;}
+            if (anim.curFrame != anim.atlas.spriteCount - 1) {anim.curFrame++;}
             else {anim.curFrame = 0;}
             anim.curStep = 0;
-        } else {anim.curStep++;}
+        }
+        else {anim.curStep++;}
         
         DrawTextureRec(anim.atlas.texture, anim.atlas.sprites[anim.curFrame].sourceRec, position, WHITE);
     }

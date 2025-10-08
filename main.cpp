@@ -61,6 +61,7 @@ int main()
     Texture2D textBox = LoadTexture("assets/imgs/text_box.png");
     Texture2D attackBox = LoadTexture("assets/imgs/attack_box.png");
     Texture2D bg = LoadTexture("assets/imgs/bg.png");
+    Texture2D froggitHurt = LoadTexture("assets/imgs/froggit_hurt.png");
     TextureAtlas optAtlas = LoadAtlas("assets/atlases/opt.rtpa");
     AnimAtlas froggitAtlas = {LoadAtlas("assets/atlases/froggit.rtpa"), 0, 3, 0};
 
@@ -101,7 +102,8 @@ int main()
         DrawTexture(bg, 0, 0, WHITE);
         
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
-        AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22} + enemyOffset);
+        if (!enemyShake) {AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22} + enemyOffset);}
+        else {DrawTexture(froggitHurt, 50 + enemyOffset.x, 22 + enemyOffset.y, WHITE);}
         switch (menuState) {
             case 1:
                 DrawTexture(attackBox, 7, 78, WHITE);
@@ -200,6 +202,7 @@ int main()
                 menuState = 0;
                 enDamageTaken = 0;
                 enemyShake = false;
+                froggitAtlas.curFrame = 9;
             }
             // If this sound effect has reached the enemy damage sound bite, begin decreasing HP and shaking enemy
             else if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.5f) {
