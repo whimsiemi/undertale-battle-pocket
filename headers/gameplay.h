@@ -4,15 +4,20 @@
 
 namespace gameplay {
     int attackBarX;
+    
+    // Literally just resets the moving bar's x value
     void initAttack(){
         attackBarX = 150;
     }
-    void drawAttackBar(){
-        DrawRectangle(attackBarX, 79, 2, 34, GetColor(0x9BBC0FFF));
-        attackBarX -= 2;
+
+    // Draws the moving bar that indicates hit timing
+    void drawAttackBar(bool hasAttacked){
+        DrawRectangle(attackBarX - 1, 79, 2, 34, GetColor(0x9BBC0FFF));
+        if (!hasAttacked) {attackBarX -= 2;}
     }
+
+    // Check for if player has inputted or the timing window has been exceeded
     int attackMechanic(bool attackInput){
-        std::cout << TextFormat("%d", attackBarX) << std::endl;
         if (attackBarX < 8) {
             return 1;
         }
@@ -21,12 +26,13 @@ namespace gameplay {
         }
         return 0;
     }
+    // Returns the amount of damage that the enemy should take based on the hit accuracy
     int damageEnemy(){
-        int accuracy = Clamp(floor(abs(attackBarX - 80)), 10, 80);
-        if (accuracy == 10)
+        int accuracy = (GetScreenWidth() / 2 - floor(abs(attackBarX - GetScreenWidth() / 2))) * 100 / (GetScreenWidth() / 2);
+        if (accuracy >= 90)
         {
             return 25;
         }
-        return 10 + (25 / (1 + accuracy));
+        return accuracy / 4;
     }
 }

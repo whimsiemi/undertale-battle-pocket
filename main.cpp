@@ -10,6 +10,7 @@ using namespace atlas;
 using namespace input;
 using namespace gameplay;
 
+// EXCUSE THE MESSY CODE! This is my first raylib project and I'm not necessarily known for optimized codebases lol, so look at this with a grain of salt
 int main()
 {
     // Window parameters go here
@@ -27,6 +28,7 @@ int main()
     Music musCh4 = LoadMusicStream("assets/music/mus.ch4.wav");
     Music sfxCh2 = LoadMusicStream("assets/music/sfx.ch2.wav");
     Music sfxCh4 = LoadMusicStream("assets/music/sfx.ch4.wav");
+    Music sfx2Ch4 = LoadMusicStream("assets/music/sfx2.ch4.wav");
     PlayMusicStream(musCh1);
     PlayMusicStream(musCh2);
     PlayMusicStream(musCh3);
@@ -49,12 +51,21 @@ int main()
     float shakeDuration = 0.0f;
     float shakeMagnitude = 5.0f;
 
+    bool enemyShake = false;
+    float enemyShakeMagnitude = 2.0f;
+
+    bool hasAttacked = true;
+    int enDamageTaken = 0;
+
     // Image/atlas assets
     Texture2D textBox = LoadTexture("assets/imgs/text_box.png");
     Texture2D attackBox = LoadTexture("assets/imgs/attack_box.png");
     Texture2D bg = LoadTexture("assets/imgs/bg.png");
     TextureAtlas optAtlas = LoadAtlas("assets/atlases/opt.rtpa");
     AnimAtlas froggitAtlas = {LoadAtlas("assets/atlases/froggit.rtpa"), 0, 3, 0};
+
+    // Used for the enemy shake effect
+    Vector2 enemyOffset = Vector2({0, 0});
 
     // Font asset
     Font font = LoadFontEx("assets/fonts/detectives_n_dames_by_2bitcrook.ttf", 8, 0, 95);
@@ -70,6 +81,7 @@ int main()
 
     const int maxEnHp = 50;
     int curEnHp = maxEnHp;
+    int prevEnHp = curEnHp;
 
     // Main game loop
     while (!WindowShouldClose()) {
@@ -81,11 +93,15 @@ int main()
         UpdateMusicStream(musCh4);
         UpdateMusicStream(sfxCh2);
         UpdateMusicStream(sfxCh4);
+        UpdateMusicStream(sfx2Ch4);
         ClearBackground(gb);
         BeginDrawing();
 
         // Draws all visuals
         DrawTexture(bg, 0, 0, WHITE);
+        
+        // A separate function is used to animate animated atlas sprites, makes everything much cleaner
+        AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22} + enemyOffset);
         switch (menuState) {
             case 1:
                 DrawTexture(attackBox, 7, 78, WHITE);
@@ -98,14 +114,12 @@ int main()
         DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 127});
         DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
 
-        // A separate function is used to animate animated atlas sprites, makes everything much cleaner
-        AnimateAtlasSprite(froggitAtlas, "froggit", (Vector2){50, 22});
-
-        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2, 10}, (float)font.baseSize, 2, gb);
+        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 10}, (float)font.baseSize, 2, gb);
 
         std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
         infoStr += TextFormat("/%d", maxHp);
 
+        // HP display text
         std::string boxTxt("* Froggit hopped close!");
         if (curEnHp <= 0) {
             boxTxt = TextFormat("* Froggit is defeated!");
@@ -142,6 +156,7 @@ int main()
                     switch (menuSelect) {
                         case 0:
                             menuState = 1;
+                            hasAttacked = false;
                             initAttack();
                             break;
                     }
@@ -154,18 +169,20 @@ int main()
             case 1:
                 switch (attackMechanic(getInput("select"))) {
                     case 0:
-                        drawAttackBar();
+                        drawAttackBar(hasAttacked);
                         break;
                     case 1:
+                        hasAttacked = true;
                         menuState = 0;
                         break;
                     case 2:
-                        curEnHp = Clamp(curEnHp - damageEnemy(), 0, maxEnHp);
-                        shakeMagnitude = damageEnemy();
+                        hasAttacked = true;
+                        prevEnHp = curEnHp;
+                        enDamageTaken = damageEnemy();
+                        shakeMagnitude = enDamageTaken;
                         shakeDuration = 0.5f;
-                        menuState = 0;
-                        SetMusicVolume(musCh2, 0);
-                        PlayMusicStream(sfxCh2);
+                        SetMusicVolume(musCh4, 0);
+                        PlayMusicStream(sfx2Ch4);
                         break;
                 }
                 break;
@@ -176,22 +193,48 @@ int main()
             StopMusicStream(sfxCh4);
             SetMusicVolume(musCh4, 1);
         }
-
+        if (IsMusicStreamPlaying(sfx2Ch4)) {
+            if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.95f) {
+                StopMusicStream(sfx2Ch4);
+                SetMusicVolume(musCh4, 1);
+                menuState = 0;
+                enDamageTaken = 0;
+                enemyShake = false;
+            }
+            // If this sound effect has reached the enemy damage sound bite, begin decreasing HP and shaking enemy
+            else if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.5f) {
+                enemyShake = true;
+                curEnHp = Lerp(curEnHp, Clamp(prevEnHp - enDamageTaken, 0, maxEnHp), 0.1f);
+            }
+        }
         if (IsMusicStreamPlaying(sfxCh2) && (GetMusicTimePlayed(sfxCh2) / GetMusicTimeLength(sfxCh2)) >= 0.5f) {
             StopMusicStream(sfxCh2);
             SetMusicVolume(musCh2, 1);
         }
 
+        // Render target shake uses duration to track how long it should be shaking for (the shake itself is done by offsetting the position by a shake offset)
         if (shakeDuration > 0.0f)
         {
-            shakeDuration -= GetFrameTime(); // Decrease shake time
+            shakeDuration -= GetFrameTime();
             float shakeX = (float)(rand() % 100 - 50) / 50.0f * shakeMagnitude;
             float shakeY = (float)(rand() % 100 - 50) / 50.0f * shakeMagnitude;
             renderOffset = (Vector2){shakeX, shakeY};
         }
         else
         {
-            renderOffset = (Vector2){0, 0}; // Reset camera
+            renderOffset = (Vector2){0, 0};
+        }
+
+        // Enemy shake uses a boolean, so that it will shake throughout the entire health deduction lerp
+        if (enemyShake)
+        {
+            float shakeX = (float)(rand() % 100 - 50) / 50.0f * enemyShakeMagnitude;
+            float shakeY = (float)(rand() % 100 - 50) / 50.0f * enemyShakeMagnitude;
+            enemyOffset = (Vector2){shakeX, shakeY};
+        }
+        else
+        {
+            enemyOffset = (Vector2){0, 0};
         }
 
         // Draws render texture to the screen at a scale relative to the window size
@@ -208,6 +251,7 @@ int main()
     UnloadMusicStream(musCh4);
     UnloadMusicStream(sfxCh2);
     UnloadMusicStream(sfxCh4);
+    UnloadMusicStream(sfx2Ch4);
     UnloadRenderTexture(target);
     CloseAudioDevice();
     CloseWindow();
