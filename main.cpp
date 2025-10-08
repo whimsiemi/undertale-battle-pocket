@@ -114,7 +114,7 @@ int main()
         DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 127});
         DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
 
-        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 10}, (float)font.baseSize, 2, gb);
+        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 14}, (float)font.baseSize, 2, gb);
 
         std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
         infoStr += TextFormat("/%d", maxHp);

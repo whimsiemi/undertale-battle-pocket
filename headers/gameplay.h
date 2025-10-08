@@ -4,7 +4,7 @@
 
 namespace gameplay {
     int attackBarX;
-    
+
     // Literally just resets the moving bar's x value
     void initAttack(){
         attackBarX = 150;
@@ -28,7 +28,7 @@ namespace gameplay {
     }
     // Returns the amount of damage that the enemy should take based on the hit accuracy
     int damageEnemy(){
-        int accuracy = (GetScreenWidth() / 2 - floor(abs(attackBarX - GetScreenWidth() / 2))) * 100 / (GetScreenWidth() / 2);
+        int accuracy = floor((80 - abs(attackBarX - 80)) * 1.25f);
         if (accuracy >= 90)
         {
             return 25;
