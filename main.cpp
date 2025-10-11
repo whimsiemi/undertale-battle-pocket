@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "headers/atlas.h"
-#include "headers/input.h"
-#include "headers/gameplay.h"
+#include "headers/atlas.hpp"
+#include "headers/input.hpp"
+#include "headers/gameplay.hpp"
 
 using namespace atlas;
 using namespace input;
@@ -57,13 +57,17 @@ int main()
     bool hasAttacked = true;
     int enDamageTaken = 0;
 
+    Vector2 playerPos = {77, 93};
+
     // Image/atlas assets
     Texture2D textBox = LoadTexture("assets/imgs/text_box.png");
     Texture2D attackBox = LoadTexture("assets/imgs/attack_box.png");
+    Texture2D fightBox = LoadTexture("assets/imgs/fight_box.png");
     Texture2D bg = LoadTexture("assets/imgs/bg.png");
     Texture2D froggitHurt = LoadTexture("assets/imgs/froggit_hurt.png");
     TextureAtlas optAtlas = LoadAtlas("assets/atlases/opt.rtpa");
     AnimAtlas froggitAtlas = {LoadAtlas("assets/atlases/froggit.rtpa"), 0, 3, 0};
+    Texture2D player = LoadTexture("assets/imgs/heart.png");
 
     // Used for the enemy shake effect
     Vector2 enemyOffset = Vector2({0, 0});
@@ -74,7 +78,7 @@ int main()
     // Used for determining which option to highlight (and select if the select key is pressed once that's implemented)
     int menuSelect = 0;
 
-    // Used for menu switch statement (0 = main, 1 = attack, 2 = act, 3 = item, 4 = mercy)
+    // Used for menu switch statement (0 = main, 1 = attack, 2 = dodge, 3 = act, 4 = item, 5 = mercy)
     int menuState = 0;
 
     const int maxHp = 20;
@@ -107,6 +111,14 @@ int main()
         switch (menuState) {
             case 1:
                 DrawTexture(attackBox, 7, 78, WHITE);
+                break;
+            case 2:
+                DrawTexture(fightBox, 62, 78, WHITE);
+                if (getInput("up") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{62, 79, 37, 2})) {playerPos.y--;}
+                if (getInput("down") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{62, 111, 37, 2})) {playerPos.y++;}
+                if (getInput("left") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{62, 79, 3, 36})) {playerPos.x--;}
+                if (getInput("right") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{95, 79, 2, 36})) {playerPos.x++;}
+                DrawTexture(player, playerPos.x, playerPos.y, WHITE);
                 break;
             default:
                  DrawTexture(textBox, 7, 78, WHITE);
@@ -175,7 +187,7 @@ int main()
                         break;
                     case 1:
                         hasAttacked = true;
-                        menuState = 0;
+                        menuState = 2;
                         break;
                     case 2:
                         hasAttacked = true;
@@ -199,7 +211,7 @@ int main()
             if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.95f) {
                 StopMusicStream(sfx2Ch4);
                 SetMusicVolume(musCh4, 1);
-                menuState = 0;
+                menuState = 2;
                 enDamageTaken = 0;
                 enemyShake = false;
                 froggitAtlas.curFrame = 9;
