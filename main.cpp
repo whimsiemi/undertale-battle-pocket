@@ -2,13 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
+#include <vector>
 #include "headers/atlas.hpp"
 #include "headers/input.hpp"
 #include "headers/gameplay.hpp"
+#include "headers/funcs.hpp"
 
 using namespace atlas;
 using namespace input;
 using namespace gameplay;
+using namespace funcs;
 
 // EXCUSE THE MESSY CODE! This is my first raylib project and I'm not necessarily known for optimized codebases lol, so look at this with a grain of salt
 int main()
@@ -17,6 +21,8 @@ int main()
     const int screenWidth = 160;
     const int screenHeight = 140;
     const int windowScale = 5;
+
+    std::vector<Bullet> bullets;
 
     // Needed to make audio able to be played
     InitAudioDevice();
@@ -56,6 +62,12 @@ int main()
 
     bool hasAttacked = true;
     int enDamageTaken = 0;
+
+    int bulletInterval = 18;
+    int bulletCooldown = bulletInterval;
+
+    int fightLength = 150;
+    int fightDuration = 0;
 
     Vector2 playerPos = {77, 93};
 
@@ -106,7 +118,7 @@ int main()
         DrawTexture(bg, 0, 0, WHITE);
         
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
-        if (!enemyShake) {AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22} + enemyOffset);}
+        if (!enemyShake && curEnHp > 0) {AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22} + enemyOffset);}
         else {DrawTexture(froggitHurt, 50 + enemyOffset.x, 22 + enemyOffset.y, WHITE);}
         switch (menuState) {
             case 1:
@@ -119,6 +131,33 @@ int main()
                 if (getInput("left") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{62, 79, 3, 36})) {playerPos.x--;}
                 if (getInput("right") && !CheckCollisionRecs(Rectangle{playerPos.x, playerPos.y, 6, 6}, Rectangle{95, 79, 2, 36})) {playerPos.x++;}
                 DrawTexture(player, playerPos.x, playerPos.y, WHITE);
+                bulletCooldown--;
+                fightDuration++;
+                if (fightDuration >= fightLength) {
+                    bullets.clear();
+                    menuState = 0;
+                    break;
+                }
+                if (!bulletCooldown) {
+                    bullets.push_back(*new Bullet);
+                    bullets.back().BulletLogic();
+                    bulletCooldown = bulletInterval;
+                }
+                for (auto it = bullets.begin(); it != bullets.end(); ) {
+                    it->BulletLogic();
+                    if (it->ShouldDeleteBullet())
+                    {
+                        it = bullets.erase(it);
+                    }
+                    else if (it->BulletCollision(playerPos))
+                    {
+                        it = bullets.erase(it);
+                        if (curHp >= 2) {curHp -= 2;}
+                    }
+                    else {
+                        ++it;
+                    }
+                }
                 break;
             default:
                  DrawTexture(textBox, 7, 78, WHITE);
@@ -169,9 +208,11 @@ int main()
                 if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
                     switch (menuSelect) {
                         case 0:
-                            menuState = 1;
-                            hasAttacked = false;
-                            initAttack();
+                            if (curEnHp > 0) {
+                                menuState = 1;
+                                hasAttacked = false;
+                                InitAttack();
+                            }
                             break;
                     }
                     SetMusicVolume(musCh2, 0);
@@ -181,9 +222,9 @@ int main()
                 DrawTextEx(font, boxTxt.c_str(), (Vector2){11, 82}, (float)font.baseSize, 2, gb);
                 break;
             case 1:
-                switch (attackMechanic(getInput("select"))) {
+                switch (AttackMechanic(getInput("select"))) {
                     case 0:
-                        drawAttackBar(hasAttacked);
+                        DrawAttackBar(hasAttacked);
                         break;
                     case 1:
                         hasAttacked = true;
@@ -192,7 +233,7 @@ int main()
                     case 2:
                         hasAttacked = true;
                         prevEnHp = curEnHp;
-                        enDamageTaken = damageEnemy();
+                        enDamageTaken = DamageEnemy();
                         shakeMagnitude = enDamageTaken;
                         shakeDuration = 0.5f;
                         SetMusicVolume(musCh4, 0);
@@ -211,10 +252,18 @@ int main()
             if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.95f) {
                 StopMusicStream(sfx2Ch4);
                 SetMusicVolume(musCh4, 1);
-                menuState = 2;
-                enDamageTaken = 0;
-                enemyShake = false;
-                froggitAtlas.curFrame = 9;
+                if (curEnHp > 0) {
+                    menuState = 2;
+                    enDamageTaken = 0;
+                    enemyShake = false;
+                    froggitAtlas.curFrame = 9;
+                    bulletCooldown = bulletInterval;
+                    fightDuration = 0;
+                }
+                else {
+                    enemyShake = false;
+                    menuState = 0;
+                }
             }
             // If this sound effect has reached the enemy damage sound bite, begin decreasing HP and shaking enemy
             else if ((GetMusicTimePlayed(sfx2Ch4) / GetMusicTimeLength(sfx2Ch4)) >= 0.5f) {
