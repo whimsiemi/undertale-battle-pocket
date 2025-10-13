@@ -113,6 +113,11 @@ int main()
         UpdateMusicStream(sfx2Ch4);
         ClearBackground(gb);
         BeginDrawing();
+        
+        if (getInput("restart")) {
+            curEnHp = maxEnHp;
+            curHp = maxHp;
+        }
 
         // Draws all visuals
         DrawTexture(bg, 0, 0, WHITE);
@@ -220,6 +225,7 @@ int main()
                 }
                 // Draws text within the text box
                 DrawTextEx(font, boxTxt.c_str(), (Vector2){11, 82}, (float)font.baseSize, 2, gb);
+                if(boxTxt == "* Froggit hopped close!"){DrawTextEx(font, "* Press Z to select and\nattack!", (Vector2){11, 92}, (float)font.baseSize, 2, gb);}
                 break;
             case 1:
                 switch (AttackMechanic(getInput("select"))) {
