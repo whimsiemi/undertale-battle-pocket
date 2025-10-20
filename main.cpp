@@ -267,14 +267,14 @@ int main()
                 break;
             case 2:
                 if (getInput("down") && !IsMusicStreamPlaying(sfxCh4)) {
-                    if (menuSelect < inventory.size()) {menuSelect++;}
+                    if (menuSelect < inventory.size() - 1) {menuSelect++;}
                     else {menuSelect = 0;}
                     SetMusicVolume(musCh4, 0);
                     PlayMusicStream(sfxCh4);
                     std::cout << inventory[menuSelect].name.c_str() << std::endl;
                 } else if (getInput("up") && !IsMusicStreamPlaying(sfxCh4)) {
                     if (menuSelect > 0) {menuSelect--;}
-                    else {menuSelect = inventory.size();}
+                    else {menuSelect = inventory.size() - 1;}
                     SetMusicVolume(musCh4, 0);
                     PlayMusicStream(sfxCh4);
                     std::cout << inventory[menuSelect].name.c_str() << std::endl;
