@@ -71,6 +71,24 @@ int main()
 
     Vector2 playerPos = {77, 93};
 
+    struct Item {
+        std::string name = "";
+        std::string type = "";
+        int increment = 0;
+    };
+
+    std::vector<Item> inventory;
+
+    struct Item itemList[] = {
+        {"Candy", "Health", 10},
+        {"Boxing Gloves", "Attack", 1},
+        {"Wooden Shield", "Defense", 1},
+    };
+
+    for (int i = 0; i < (sizeof(itemList) / sizeof(itemList[0])); i++) {
+        inventory.push_back(itemList[i]);
+    }
+
     // Image/atlas assets
     Texture2D textBox = LoadTexture("assets/imgs/text_box.png");
     Texture2D attackBox = LoadTexture("assets/imgs/attack_box.png");
@@ -245,6 +263,34 @@ int main()
                         SetMusicVolume(musCh4, 0);
                         PlayMusicStream(sfx2Ch4);
                         break;
+                }
+                break;
+            case 2:
+                if (getInput("down") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect < inventory.size()) {menuSelect++;}
+                    else {menuSelect = 0;}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                    std::cout << inventory[menuSelect].name.c_str() << std::endl;
+                } else if (getInput("up") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect > 0) {menuSelect--;}
+                    else {menuSelect = inventory.size();}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                    std::cout << inventory[menuSelect].name.c_str() << std::endl;
+                }
+                if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
+                    switch (menuSelect) {
+                        case 0:
+                            if (curEnHp > 0) {
+                                menuState = 1;
+                                hasAttacked = false;
+                                InitAttack();
+                            }
+                            break;
+                    }
+                    SetMusicVolume(musCh2, 0);
+                    PlayMusicStream(sfxCh2); 
                 }
                 break;
         }
