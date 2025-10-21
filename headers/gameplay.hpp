@@ -16,7 +16,6 @@ namespace gameplay {
             };
             Texture2D bulletTex = LoadTexture("assets/imgs/bullet.png");
             void BulletLogic() {
-                std::cout << "BULLET!";
                 position += Vector2Normalize(direction) * speed;
                 DrawTexture(bulletTex, position.x, position.y, WHITE);
             }
@@ -50,12 +49,12 @@ namespace gameplay {
         return 0;
     }
     // Returns the amount of damage that the enemy should take based on the hit accuracy
-    int DamageEnemy(){
+    int DamageEnemy(float mult){
         int accuracy = floor((80 - abs(attackBarX - 80)) * 1.25f);
         if (accuracy >= 90)
         {
-            return 25;
+            return floor(25 * mult);
         }
-        return accuracy / 4;
+        return floor((accuracy / 4) * mult);
     }
 }

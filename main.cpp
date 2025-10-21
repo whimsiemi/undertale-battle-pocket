@@ -71,18 +71,19 @@ int main()
 
     Vector2 playerPos = {77, 93};
 
+    // Types: 0 = health, 1 = attack, 2 = defense
     struct Item {
         std::string name = "";
-        std::string type = "";
+        int type = 0;
         int increment = 0;
     };
 
     std::vector<Item> inventory;
 
     struct Item itemList[] = {
-        {"Candy", "Health", 10},
-        {"Boxing Gloves", "Attack", 1},
-        {"Wooden Shield", "Defense", 1},
+        {"Candy", 0, 10},
+        {"Boxing Gloves", 1, 5},
+        {"Wooden Shield", 2, 10},
     };
 
     for (int i = 0; i < (sizeof(itemList) / sizeof(itemList[0])); i++) {
@@ -113,6 +114,9 @@ int main()
 
     const int maxHp = 20;
     int curHp = maxHp;
+
+    float damageMult = 1.0f;
+    float defenseMult = 1.0f;
 
     const int maxEnHp = 50;
     int curEnHp = maxEnHp;
@@ -175,20 +179,32 @@ int main()
                     else if (it->BulletCollision(playerPos))
                     {
                         it = bullets.erase(it);
-                        if (curHp >= 2) {curHp -= 2;}
+                        if (curHp >= (2 / defenseMult)) {curHp -= (2 / defenseMult);}
                     }
                     else {
                         ++it;
                     }
                 }
                 break;
+            case 4:
+                DrawTexture(textBox, 7, 78, WHITE);
+                for (int i = 0; i < inventory.size(); i++) {
+                    std::string name = inventory[i].name;
+                    if (i == menuSelect) {name += " <-";}
+                    DrawTextEx(font, name.c_str(), (Vector2){11, 82 + (10*i)}, (float)font.baseSize, 2, gb);
+                }
+                if (getInput("back")) {
+                    menuSelect = 0;
+                    menuState = 0;
+                }
+                break;
             default:
                  DrawTexture(textBox, 7, 78, WHITE);
         }
-        DrawAtlasSprite(optAtlas, (menuSelect == 0 ? "fight_selected" : "fight"), (Vector2){7, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 1 ? "act_selected" : "act"), (Vector2){46, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 2 ? "item_selected" : "item"), (Vector2){86, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 3 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 0 && menuState == 0 ? "fight_selected" : "fight"), (Vector2){7, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 1 && menuState == 0 ? "act_selected" : "act"), (Vector2){46, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 2 && menuState == 0 ? "item_selected" : "item"), (Vector2){86, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
 
         DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 14}, (float)font.baseSize, 2, gb);
 
@@ -237,6 +253,12 @@ int main()
                                 InitAttack();
                             }
                             break;
+                        case 2:
+                            if (inventory.size() > 0) {
+                                menuSelect = 0;
+                                menuState = 4;
+                            }
+                            break;
                     }
                     SetMusicVolume(musCh2, 0);
                     PlayMusicStream(sfxCh2); 
@@ -253,11 +275,14 @@ int main()
                     case 1:
                         hasAttacked = true;
                         menuState = 2;
+                        enDamageTaken = 0;
+                        bulletCooldown = bulletInterval;
+                        fightDuration = 0;
                         break;
                     case 2:
                         hasAttacked = true;
                         prevEnHp = curEnHp;
-                        enDamageTaken = DamageEnemy();
+                        enDamageTaken = DamageEnemy(damageMult);
                         shakeMagnitude = enDamageTaken;
                         shakeDuration = 0.5f;
                         SetMusicVolume(musCh4, 0);
@@ -265,30 +290,33 @@ int main()
                         break;
                 }
                 break;
-            case 2:
+            case 4:
                 if (getInput("down") && !IsMusicStreamPlaying(sfxCh4)) {
                     if (menuSelect < inventory.size() - 1) {menuSelect++;}
                     else {menuSelect = 0;}
                     SetMusicVolume(musCh4, 0);
                     PlayMusicStream(sfxCh4);
-                    std::cout << inventory[menuSelect].name.c_str() << std::endl;
                 } else if (getInput("up") && !IsMusicStreamPlaying(sfxCh4)) {
                     if (menuSelect > 0) {menuSelect--;}
                     else {menuSelect = inventory.size() - 1;}
                     SetMusicVolume(musCh4, 0);
                     PlayMusicStream(sfxCh4);
-                    std::cout << inventory[menuSelect].name.c_str() << std::endl;
                 }
                 if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
-                    switch (menuSelect) {
+                    switch (inventory[menuSelect].type) {
                         case 0:
-                            if (curEnHp > 0) {
-                                menuState = 1;
-                                hasAttacked = false;
-                                InitAttack();
-                            }
+                            curHp = Clamp(curHp + inventory[menuSelect].increment, 0, maxHp);
+                            break;
+                        case 1:
+                            damageMult += float(inventory[menuSelect].increment) / 10;
+                            break;
+                        case 2:
+                            defenseMult += float(inventory[menuSelect].increment) / 10;
                             break;
                     }
+                    inventory.erase(inventory.begin() + menuSelect);
+                    menuState = 0;
+                    menuSelect = 0;
                     SetMusicVolume(musCh2, 0);
                     PlayMusicStream(sfxCh2); 
                 }
