@@ -42,6 +42,8 @@ int main()
     
     // Defining a color for the background (note: kind of redundant, oops)
     Color gb = GetColor(0x9BBC0FFF);
+
+    std::string boxTxt = TextFormat("* Froggit hopped close!\n* Press Z to select and\nattack!");
     
     // When we initialize the window, we want the player to be able to resize it to be as big as they want
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -86,6 +88,11 @@ int main()
         {"Wooden Shield", 2, 10},
     };
 
+    std::string actList[] = {
+        "Compliment",
+        "Threaten",
+    };
+
     for (int i = 0; i < (sizeof(itemList) / sizeof(itemList[0])); i++) {
         inventory.push_back(itemList[i]);
     }
@@ -111,6 +118,8 @@ int main()
 
     // Used for menu switch statement (0 = main, 1 = attack, 2 = dodge, 3 = act, 4 = item, 5 = mercy)
     int menuState = 0;
+
+    bool canMercy = false;
 
     const int maxHp = 20;
     int curHp = maxHp;
@@ -148,8 +157,89 @@ int main()
         if (!enemyShake && curEnHp > 0) {AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22} + enemyOffset);}
         else {DrawTexture(froggitHurt, 50 + enemyOffset.x, 22 + enemyOffset.y, WHITE);}
         switch (menuState) {
+            case 0:
+                DrawTexture(textBox, 7, 78, WHITE);
+                if (getInput("right") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect < 3) {menuSelect++;}
+                    else {menuSelect = 0;}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                } else if (getInput("left") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect > 0) {menuSelect--;}
+                    else {menuSelect = 3;}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                }
+                if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
+                    switch (menuSelect) {
+                        case 0:
+                            if (curEnHp > 0) {
+                                menuState = 1;
+                                hasAttacked = false;
+                                InitAttack();
+                            }
+                            break;
+                        case 1:
+                            menuSelect = 0;
+                            menuState = 3;
+                            break;
+                        case 2:
+                            if (inventory.size() > 0) {
+                                menuSelect = 0;
+                                menuState = 4;
+                            }
+                            break;
+                        case 3:
+                            if (canMercy){
+                                curEnHp = 0;
+                                menuSelect = 0;
+                                menuState = 0;
+                            }
+                            break;
+                    }
+                    SetMusicVolume(musCh2, 0);
+                    PlayMusicStream(sfxCh2); 
+                }
+                // HP display text
+                if (curEnHp <= 0) {
+                    boxTxt = TextFormat("* Froggit is defeated!");
+                }
+                else if (curEnHp <= (maxEnHp / 3)) {
+                    boxTxt = TextFormat("* Froggit is crticially \nwounded!");
+                }
+                else if (curEnHp <= (maxEnHp / 2)) {
+                    boxTxt = TextFormat("* Froggit is wounded!");
+                }
+                else if (curEnHp < maxEnHp)
+                {
+                    boxTxt = TextFormat("* Froggit feels a small \n pain!");
+                }
+                // Draws text within the text box
+                DrawTextEx(font, boxTxt.c_str(), (Vector2){11, 82}, (float)font.baseSize, 2, gb);
+                break;
             case 1:
                 DrawTexture(attackBox, 7, 78, WHITE);
+                switch (AttackMechanic(getInput("select"))) {
+                    case 0:
+                        DrawAttackBar(hasAttacked);
+                        break;
+                    case 1:
+                        hasAttacked = true;
+                        menuState = 2;
+                        enDamageTaken = 0;
+                        bulletCooldown = bulletInterval;
+                        fightDuration = 0;
+                        break;
+                    case 2:
+                        hasAttacked = true;
+                        prevEnHp = curEnHp;
+                        enDamageTaken = DamageEnemy(damageMult);
+                        shakeMagnitude = enDamageTaken;
+                        shakeDuration = 0.5f;
+                        SetMusicVolume(musCh4, 0);
+                        PlayMusicStream(sfx2Ch4);
+                        break;
+                }
                 break;
             case 2:
                 DrawTexture(fightBox, 62, 78, WHITE);
@@ -186,6 +276,36 @@ int main()
                     }
                 }
                 break;
+            case 3:
+                DrawTexture(textBox, 7, 78, WHITE);
+                for (int i = 0; i < sizeof(actList) / sizeof(actList[0]); i++) {
+                    std::string name = actList[i];
+                    if (i == menuSelect) {name += " <-";}
+                    DrawTextEx(font, name.c_str(), (Vector2){11, 82 + (10*i)}, (float)font.baseSize, 2, gb);
+                }
+                if (getInput("back")) {
+                    menuSelect = 0;
+                    menuState = 0;
+                }
+                if (getInput("down") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect < sizeof(actList) / sizeof(actList[0]) - 1) {menuSelect++;}
+                    else {menuSelect = 0;}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                } else if (getInput("up") && !IsMusicStreamPlaying(sfxCh4)) {
+                    if (menuSelect > 0) {menuSelect--;}
+                    else {menuSelect = sizeof(actList) / sizeof(actList[0]) - 1;}
+                    SetMusicVolume(musCh4, 0);
+                    PlayMusicStream(sfxCh4);
+                }
+                if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
+                    if (actList[menuSelect] == "Compliment") {canMercy = true;}
+                    menuState = 2;
+                    menuSelect = 0;
+                    SetMusicVolume(musCh2, 0);
+                    PlayMusicStream(sfxCh2); 
+                }
+                break;
             case 4:
                 DrawTexture(textBox, 7, 78, WHITE);
                 for (int i = 0; i < inventory.size(); i++) {
@@ -197,100 +317,6 @@ int main()
                     menuSelect = 0;
                     menuState = 0;
                 }
-                break;
-            default:
-                 DrawTexture(textBox, 7, 78, WHITE);
-        }
-        DrawAtlasSprite(optAtlas, (menuSelect == 0 && menuState == 0 ? "fight_selected" : "fight"), (Vector2){7, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 1 && menuState == 0 ? "act_selected" : "act"), (Vector2){46, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 2 && menuState == 0 ? "item_selected" : "item"), (Vector2){86, 127});
-        DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "mercy_selected" : "mercy"), (Vector2){125, 127});
-
-        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 14}, (float)font.baseSize, 2, gb);
-
-        std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
-        infoStr += TextFormat("/%d", maxHp);
-
-        // HP display text
-        std::string boxTxt("* Froggit hopped close!");
-        if (curEnHp <= 0) {
-            boxTxt = TextFormat("* Froggit is defeated!");
-        }
-        else if (curEnHp <= (maxEnHp / 3)) {
-            boxTxt = TextFormat("* Froggit is crticially \nwounded!");
-        }
-        else if (curEnHp <= (maxEnHp / 2)) {
-            boxTxt = TextFormat("* Froggit is wounded!");
-        }
-        else if (curEnHp < maxEnHp)
-        {
-            boxTxt = TextFormat("* Froggit feels a small \n pain!");
-        }
-
-        DrawTextEx(font, infoStr.c_str(), (Vector2){7, 116}, (float)font.baseSize, 2, gb);
-
-        // Navigate menu using polled inputs checked within the input header's "getInput" function (also handles sound effects overwriting music in their respective channels)
-        switch (menuState)
-        {
-            case 0:
-                if (getInput("right") && !IsMusicStreamPlaying(sfxCh4)) {
-                    if (menuSelect < 3) {menuSelect++;}
-                    else {menuSelect = 0;}
-                    SetMusicVolume(musCh4, 0);
-                    PlayMusicStream(sfxCh4);
-                } else if (getInput("left") && !IsMusicStreamPlaying(sfxCh4)) {
-                    if (menuSelect > 0) {menuSelect--;}
-                    else {menuSelect = 3;}
-                    SetMusicVolume(musCh4, 0);
-                    PlayMusicStream(sfxCh4);
-                }
-                if (getInput("select") && !IsMusicStreamPlaying(sfxCh2)) {
-                    switch (menuSelect) {
-                        case 0:
-                            if (curEnHp > 0) {
-                                menuState = 1;
-                                hasAttacked = false;
-                                InitAttack();
-                            }
-                            break;
-                        case 2:
-                            if (inventory.size() > 0) {
-                                menuSelect = 0;
-                                menuState = 4;
-                            }
-                            break;
-                    }
-                    SetMusicVolume(musCh2, 0);
-                    PlayMusicStream(sfxCh2); 
-                }
-                // Draws text within the text box
-                DrawTextEx(font, boxTxt.c_str(), (Vector2){11, 82}, (float)font.baseSize, 2, gb);
-                if(boxTxt == "* Froggit hopped close!"){DrawTextEx(font, "* Press Z to select and\nattack!", (Vector2){11, 92}, (float)font.baseSize, 2, gb);}
-                break;
-            case 1:
-                switch (AttackMechanic(getInput("select"))) {
-                    case 0:
-                        DrawAttackBar(hasAttacked);
-                        break;
-                    case 1:
-                        hasAttacked = true;
-                        menuState = 2;
-                        enDamageTaken = 0;
-                        bulletCooldown = bulletInterval;
-                        fightDuration = 0;
-                        break;
-                    case 2:
-                        hasAttacked = true;
-                        prevEnHp = curEnHp;
-                        enDamageTaken = DamageEnemy(damageMult);
-                        shakeMagnitude = enDamageTaken;
-                        shakeDuration = 0.5f;
-                        SetMusicVolume(musCh4, 0);
-                        PlayMusicStream(sfx2Ch4);
-                        break;
-                }
-                break;
-            case 4:
                 if (getInput("down") && !IsMusicStreamPlaying(sfxCh4)) {
                     if (menuSelect < inventory.size() - 1) {menuSelect++;}
                     else {menuSelect = 0;}
@@ -321,7 +347,22 @@ int main()
                     PlayMusicStream(sfxCh2); 
                 }
                 break;
+            default:
+                 DrawTexture(textBox, 7, 78, WHITE);
         }
+        DrawAtlasSprite(optAtlas, (menuSelect == 0 && menuState == 0 ? "fight_selected" : "fight"), (Vector2){7, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 1 && menuState == 0 ? "act_selected" : "act"), (Vector2){46, 127});
+        DrawAtlasSprite(optAtlas, (menuSelect == 2 && menuState == 0 ? "item_selected" : "item"), (Vector2){86, 127});
+        switch (canMercy) {
+            case 0: DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "nomercy_selected" : "nomercy"), (Vector2){125, 127}); break;
+            case 1: DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "mercy_selected" : "mercy"), (Vector2){125, 127}); break;
+        }
+
+        DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 14}, (float)font.baseSize, 2, gb);
+
+        std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
+        infoStr += TextFormat("/%d", maxHp);
+        DrawTextEx(font, infoStr.c_str(), (Vector2){7, 116}, (float)font.baseSize, 2, gb);
         
         // Unmutes music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
         if (IsMusicStreamPlaying(sfxCh4) && (GetMusicTimePlayed(sfxCh4) / GetMusicTimeLength(sfxCh4)) >= 0.5f) {
