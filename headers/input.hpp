@@ -11,6 +11,7 @@ namespace input {
         else if (!strcmp(action, "down")) {return IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S) || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) >= 0.5f;}
         else if (!strcmp(action, "select")) {return IsKeyPressed(KEY_Z) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);}
         else if (!strcmp(action, "back")) {return IsKeyPressed(KEY_X) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);}
+        else if (!strcmp(action, "restart")) {return IsKeyPressed(KEY_R) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_MIDDLE_LEFT);}
         else {return 0;}  
     }
 }

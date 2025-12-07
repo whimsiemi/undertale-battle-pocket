@@ -43,7 +43,7 @@ int main()
     // Defining a color for the background (note: kind of redundant, oops)
     Color gb = GetColor(0x9BBC0FFF);
 
-    std::string boxTxt = TextFormat("* Froggit hopped close!\n* Press Z to select and\nattack!");
+    std::string boxTxt = TextFormat("* Froggit hopped close!\n* Press Z (or A)to\nselect and attack!");
     
     // When we initialize the window, we want the player to be able to resize it to be as big as they want
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -145,9 +145,15 @@ int main()
         ClearBackground(gb);
         BeginDrawing();
         
-        if (getInput("restart")) {
+        if (getInput("restart") && !menuState) {
             curEnHp = maxEnHp;
             curHp = maxHp;
+            canMercy = false;
+            boxTxt = TextFormat("* Froggit hopped close!\n* Press Z (or A)to\nselect and attack!");
+            inventory.clear();
+            for (int i = 0; i < (sizeof(itemList) / sizeof(itemList[0])); i++) {
+                inventory.push_back(itemList[i]);
+            }
         }
 
         // Draws all visuals
@@ -156,7 +162,11 @@ int main()
         // A separate function is used to animate animated atlas sprites, makes everything much cleaner
         if (!enemyShake && curEnHp > 0) {AnimateAtlasSprite(froggitAtlas, (Vector2){50, 22} + enemyOffset);}
         else {DrawTexture(froggitHurt, 50 + enemyOffset.x, 22 + enemyOffset.y, WHITE);}
-        switch (menuState) {
+        if (curEnHp > 0) {
+            std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
+            infoStr += TextFormat("/%d", maxHp);
+            DrawTextEx(font, infoStr.c_str(), (Vector2){7, 116}, (float)font.baseSize, 2, gb);
+            switch (menuState) {
             case 0:
                 DrawTexture(textBox, 7, 78, WHITE);
                 if (getInput("right") && !IsMusicStreamPlaying(sfxCh4)) {
@@ -302,6 +312,10 @@ int main()
                     if (actList[menuSelect] == "Compliment") {canMercy = true;}
                     menuState = 2;
                     menuSelect = 0;
+                    enDamageTaken = 0;
+                    enemyShake = false;
+                    bulletCooldown = bulletInterval;
+                    fightDuration = 0;
                     SetMusicVolume(musCh2, 0);
                     PlayMusicStream(sfxCh2); 
                 }
@@ -356,13 +370,14 @@ int main()
         switch (canMercy) {
             case 0: DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "nomercy_selected" : "nomercy"), (Vector2){125, 127}); break;
             case 1: DrawAtlasSprite(optAtlas, (menuSelect == 3 && menuState == 0 ? "mercy_selected" : "mercy"), (Vector2){125, 127}); break;
+        }}
+        else {
+            DrawTexture(textBox, 7, 78, WHITE);
+            boxTxt = TextFormat("* Froggit is defeated!\nPress R (or SELECT) to\nrestart!");
+            DrawTextEx(font, boxTxt.c_str(), (Vector2){11, 82}, (float)font.baseSize, 2, gb);
         }
 
         DrawTextEx(font, TextFormat("%d", curEnHp), (Vector2){screenWidth / 2 - ((MeasureText(TextFormat("%d", curEnHp), (float)font.baseSize)) / 2), 14}, (float)font.baseSize, 2, gb);
-
-        std::string infoStr(TextFormat("FRISK   LV 1   HP %d", curHp));
-        infoStr += TextFormat("/%d", maxHp);
-        DrawTextEx(font, infoStr.c_str(), (Vector2){7, 116}, (float)font.baseSize, 2, gb);
         
         // Unmutes music played in certain channels when sound effects played in them finish (nice lil hardware accuracy thing!)
         if (IsMusicStreamPlaying(sfxCh4) && (GetMusicTimePlayed(sfxCh4) / GetMusicTimeLength(sfxCh4)) >= 0.5f) {
