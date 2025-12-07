@@ -20,7 +20,7 @@ Date: 05/12/2025
 
 #### Methodology
 
-I'm generally going to be taking direct reference from UNDERTALE's gameplay footage and artwork, figuring out the fundamental mechanics behind the battle system and piecing together the process for making it all work by reading up on Raylib's documentation.
+- I'm largely took direct reference from UNDERTALE's gameplay footage and artwork, figuring out the fundamental mechanics behind the battle system and piecing together the process for making it all work by reading up on Raylib's documentation
 
 #### Game Sources
 
@@ -28,7 +28,7 @@ I'm generally going to be taking direct reference from UNDERTALE's gameplay foot
 
 #### Academic Sources
 
-I'm going to be honest: I didn't really find any academic sources throughout my research that actually aided the creation of this project, with it being such a direct translation that its input wouldn't be heavily necessary.
+- I'm going to be honest: I didn't really find any academic sources throughout my research that actually aided the creation of this project, with it being such a direct translation that its input wouldn't be heavily necessary
 
 #### Documentation Sources
 
