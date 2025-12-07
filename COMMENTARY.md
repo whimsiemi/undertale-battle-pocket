@@ -3,10 +3,13 @@
 ## UNDERTALE: Pocket Battle
 
 Name: Emily Thomas
+
 Date: 05/12/2025
 
 [Repository Link](https://github.com/whimsiemi/undertale-battle-pocket)
-[Build Link]([put build here])
+
+[Build Link](https://github.com/whimsiemi/undertale-battle-pocket/releases/tag/final)
+
 [Demo Video]([https://www.youtube.com/watch?v=oQw88WtnwII])
 
 ### Project Outline
@@ -17,20 +20,15 @@ Date: 05/12/2025
 
 #### Methodology
 
-- The process of research, testing, how you want to approach your project.
-    - You will be looking examples of first person horror games.
-    - You will doing guided testing and collecting data.
-    
-(come back to this later)
+I'm generally going to be taking direct reference from UNDERTALE's gameplay footage and artwork, figuring out the fundamental mechanics behind the battle system and piecing together the process for making it all work by reading up on Raylib's documentation.
 
 #### Game Sources
 
-- UNDERTALE (Toby Fox, 2015)
--- [Read more about the game here](https://store.steampowered.com/app/391540/Undertale/)
+- UNDERTALE (Toby Fox, 2015): [Read more about the game here](https://store.steampowered.com/app/391540/Undertale/)
 
 #### Academic Sources
 
-(come back to this later))
+I'm going to be honest: I didn't really find any academic sources throughout my research that actually aided the creation of this project, with it being such a direct translation that its input wouldn't be heavily necessary.
 
 #### Documentation Sources
 
@@ -56,17 +54,10 @@ Date: 05/12/2025
 
 #### User Testing
 
-- Talk about how users felt on the first.
-- Show some data.
-- Talk about a second test, or benchmark.
+- I did user testing about 2 weeks into development, when the attacking and dodging mechanics had just been implemented
+- If I'm being honest, most of the feedback was relatively unhelpful, as it would be reaffirming things that I had already disclosed to the testers beforehand (i.e. the lack of a mercy system, which I mentioned serveral times was being worked on)
 
-### Outcome
-
-- A Youtube Video Of demonstrating the game.
-- Trailer (if you want to).
-- Link to itch
-- Figma Board
-- Trello Board
+![Data](resources/form%20responses.png)
 
 #### Instructions To Install/Run
 
