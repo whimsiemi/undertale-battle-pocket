@@ -39,10 +39,9 @@ Date: 05/12/2025
 
 #### Process
 
-- My process for implementing features and bug fixes into this project followed this formula:
--- 1: I would write out the feature/fix's criteria in detail (for example: the Attack option required a health system as well as the accuracy microgame)
--- 2: I would piece together which examples would help me and piece together the libraries and overall program flow that would be applicable to my feature/fix, as well as search around for Stack Overflow threads if I needed specific advice not showcased within these examples
--- 3: I would begin a process of trial and error, cross referencing my sources and debugging each criteria individually until they were fully functional (repeating step 2 if the information I have isn't enough)
+- 1: I would write out the feature/fix's criteria in detail (for example: the Attack option required a health system as well as the accuracy microgame)
+- 2: I would piece together which examples would help me and piece together the libraries and overall program flow that would be applicable to my feature/fix, as well as search around for Stack Overflow threads if I needed specific advice not showcased within these examples
+- 3: I would begin a process of trial and error, cross referencing my sources and debugging each criteria individually until they were fully functional (repeating step 2 if the information I have isn't enough)
 
 #### New Approaches
 
