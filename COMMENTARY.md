@@ -45,11 +45,8 @@ Date: 05/12/2025
 
 #### New Approaches
 
-- This was my first time using Raylib
--- The aforementioned examples were crucial to understanding practical usage of the engine, as well as some more niche syntaxes
-- I had to make Game Boy styled music (albeit a remix) for the first time
--- This involved learning Trackerboy, a Game Boy sound chip music tracker software that involves inputting each played note into a top-to-bottom manner, with variables (volume, FX, etc) being read as hexadecimal values
--- My prior background in music composition made it relatively easy to transcribe the original battle song in a way that sounded good on the Game Boy's sound chip, but it was far more time consuming than other composition workflows
+- This was my first time using Raylib, the aforementioned examples were crucial to understanding practical usage of the engine, as well as some more niche syntaxes
+- I had to make Game Boy styled music (albeit a remix) for the first time, this involved learning Trackerboy, a Game Boy sound chip music tracker software that involves inputting each played note into a top-to-bottom manner, with variables (volume, FX, etc) being read as hexadecimal values, my prior background in music composition made it relatively easy to transcribe the original battle song in a way that sounded good on the Game Boy's sound chip, but it was far more time consuming than other composition workflows
 
 #### User Testing
 
